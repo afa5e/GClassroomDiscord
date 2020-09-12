@@ -8,13 +8,11 @@ from google.auth.transport.requests import Request
 
 # If modifying these scopes, delete the file token.pickle.
 SCOPES = ['https://www.googleapis.com/auth/classroom.courses.readonly']
-# Discoord bot token
+# Discord bot token
+load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 
 def main():
-    """Shows basic usage of the Classroom API.
-    Prints the names of the first 10 courses the user has access to.
-    """
     creds = None
     # The file token.pickle stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
@@ -22,6 +20,7 @@ def main():
     if os.path.exists('token.pickle'):
         with open('token.pickle', 'rb') as token:
             creds = pickle.load(token)
+
     # If there are no (valid) credentials available, let the user log in.
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
@@ -40,7 +39,7 @@ def main():
     results = service.courses().list(pageSize=13).execute()
     courses = results.get('courses', [])
 
-    # Setup Discord API
+    # Setup the Discord API
     detagger = lambda a:str(a)[:-5]
     denamer = lambda a:str(a)[-5:]
     bot_state = True
@@ -49,13 +48,16 @@ def main():
     @client.event
     async def on_message(message):
         if denamer(message.author) == '#6644':
+            print(message.channel)
             print('message received')
             if not courses:
                 await message.author.send('No courses found.')
             else:
                 await message.author.send('Course:')
                 for course in courses:
-                    await message.author.send(course['name'], course['alternateLink'])
+                    if course['courseState'] == "ACTIVE":
+                        response = course['name'] + ": " + str(course['alternateLink'])
+                        await message.author.send(response)
 
     @client.event
     async def on_ready():
