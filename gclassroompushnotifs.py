@@ -7,7 +7,10 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 
 # If modifying these scopes, delete the file token.pickle.
+# Original scope, view courses only.
 SCOPES = ['https://www.googleapis.com/auth/classroom.courses.readonly']
+# Push notifications only
+SCOPES = ['https://www.googleapis.com/auth/classroom.push-notifications']
 # Discord bot token
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
